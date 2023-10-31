@@ -1,5 +1,30 @@
-import { HardhatUserConfig } from "hardhat/config";
+import { HardhatUserConfig, task } from "hardhat/config";
+import { getContract, parseEther } from "viem";
 import "@nomicfoundation/hardhat-toolbox-viem";
+
+import { abi } from "./artifacts/contracts/BPay.sol/BPay.json";
+
+task("mint", "Mints tokens to the specified address")
+  .addParam("addr", "The address to mint to")
+  .addParam("amount", "The amount to mint")
+  .setAction(async (args, hre) => {
+    const { addr, amount } = args;
+    const [client] = await hre.viem.getWalletClients();
+
+    const contractAddress = process.env.DEPLOYED_CONTRACT_ADDR || "";
+
+    const bpay = getContract({
+      address: contractAddress as `0x${string}`,
+      abi,
+      walletClient: client,
+    });
+
+    const parsedAmount = parseEther(amount);
+
+    const txHash = await bpay.write.mint([addr, parsedAmount]);
+
+    console.log(`Minted ${amount} BPay to ${addr} in tx ${txHash}`);
+  });
 
 const config: HardhatUserConfig = {
   solidity: "0.8.20",

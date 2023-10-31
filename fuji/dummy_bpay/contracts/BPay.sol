@@ -10,6 +10,7 @@ contract BPay is ERC20 {
 
   constructor(uint256 _maxSupply) ERC20("BPay", "BPAY") {
     maxSupply = _maxSupply;
+    owner = msg.sender;
   }
 
   modifier onlyOwner() {
